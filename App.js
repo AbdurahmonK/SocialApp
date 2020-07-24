@@ -1,13 +1,21 @@
+import React from 'react' 
 import {createAppContainer, createSwitchNavigator } from 'react-navigation'
 import {createStackNavigator} from 'react-navigation-stack'
+import { createBottomTabNavigator } from 'react-navigation-tabs'
+import { Ionicons } from '@expo/vector-icons'
+
 import LoadingScreen from './screens/LoadingScreen'
 import LoginScreen from './screens/LoginScreen'
 import RegisterScreen from './screens/RegisterScreen'
+
 import HomeScreen from './screens/HomeScreen'
+import MessageScreen from './screens/MessageScreen'
+import NotificationScreen from './screens/NotificationScreen'
+import PostScreen from './screens/PostScreen'
+import ProfileScreen from './screens/ProfileScreen'
 
-import * as Firebase from 'firebase'
+import * as firebase from 'firebase'
 
-// Your web app's Firebase configuration
 var firebaseConfig = {
   apiKey: "AIzaSyDDnjfJpajE7DaLC_whyf-kNz0AThvFGcs",
   authDomain: "socialapp-9590b.firebaseapp.com",
@@ -16,24 +24,84 @@ var firebaseConfig = {
   storageBucket: "socialapp-9590b.appspot.com",
   messagingSenderId: "625245498825",
   appId: "1:625245498825:web:f10c6546a3074757b54c18"
-};
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig)
+}
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
-const AppStack = createStackNavigator({
-  Home: HomeScreen
-})
+const AppContainer = createStackNavigator(
+  {
+    default: createBottomTabNavigator(
+      {
+        Home: {
+          screen: HomeScreen,
+          navigationOptions: {
+            tabBarIcon: ({tintColor}) => <Ionicons name='ios-home' size={24} color={tintColor} />
+          }
+        },
+        Message: {
+          screen: MessageScreen,
+          navigationOptions: {
+            tabBarIcon: ({tintColor}) => <Ionicons name='ios-chatboxes' size={24} color={tintColor} />
+          }
+        },
+        Post: {
+          screen: PostScreen,
+          navigationOptions: {
+            tabBarIcon: ({tintColor}) => <Ionicons name='ios-add-circle' size={48} color='#E9446A' style={{shadowColor: '#E9446A', shadowOffset: {width: 0, height: 0}, shadowRadius: 10, shadowOpacity: 0.3}}/>
+          }
+        },
+        Notification: {
+          screen: NotificationScreen,
+          navigationOptions: {
+            tabBarIcon: ({tintColor}) => <Ionicons name='ios-notifications' size={24} color={tintColor} />
+          }
+        },
+        Profile: {
+          screen: ProfileScreen,
+          navigationOptions: {
+            tabBarIcon: ({tintColor}) => <Ionicons name='ios-person' size={24} color={tintColor} />
+          }
+        },
+      },
+      {
+        defaultNavigationOptions: {
+          tabBarOnPress: ({navigation, defaultHandler}) => {
+            if(navigation.state.key === 'Post') {
+              navigation.navigate('postModal')
+            } else {
+              defaultHandler()
+            }
+          }
+        },
+        tabBarOptions: {
+          activeTintColor: '#161F3D',
+          inactiveTintColor: '#B8BBC4',
+          showLabel: false
+        }
+      }
+    ),
+    postModal: {
+      screen: PostScreen
+    }
+  },
+  {
+    mode: 'modal',
+    headerMode: 'none'
+  }
+)
+
 
 const AuthStack = createStackNavigator({
   Login: LoginScreen,
-  Register: RegisterScreen
+  Register: RegisterScreen,
 })
 
 export default createAppContainer(
   createSwitchNavigator(
     {
       Loading: LoadingScreen,
-      App: AppStack,
+      App: AppContainer,
       Auth: AuthStack
     },
     {

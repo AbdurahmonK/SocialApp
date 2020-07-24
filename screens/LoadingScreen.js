@@ -1,10 +1,19 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
+import * as firebase from 'firebase'
+import Fire from '../Fire'
 
-export default function LoadingScreen() {
+export default function LoadingScreen(props) {
+    React.useEffect(() => {
+        firebase.auth().onAuthStateChanged( user => {
+            props.navigation.navigate(user ? 'App' : 'Auth')
+        })
+    })
+
     return (
         <View style={styles.container}>
-            <Text>Loading</Text>
+            <Text>Loading...</Text>
+            <ActivityIndicator size='large'></ActivityIndicator>
         </View>
     )
 }

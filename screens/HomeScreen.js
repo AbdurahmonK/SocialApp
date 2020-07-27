@@ -1,7 +1,7 @@
 import React from 'react'
-import { View, Text, StyleSheet, FlatList, Image } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
 import moment from 'moment'
+import { Ionicons } from '@expo/vector-icons'
+import { View, Text, StyleSheet, FlatList, Image } from 'react-native'
 
 let posts = [
     {
@@ -14,23 +14,23 @@ let posts = [
     },
     {
         id: 2,
-        name: 'Joe McKai',
+        name: 'John Smith',
         text: 'Building JavaScript bundle: finished in 88ms. Building JavaScript bundle: finished in 88ms.',
         timestamp: 1569109273726,
-        avatar: require('../assets/avatar.jpg'),
+        avatar: require('../assets/avatar2.jpg'),
         image: require('../assets/image2.jpg')
     },
     {
         id: 3,
-        name: 'Joe McKai',
+        name: 'Mack Donals',
         text: 'Building JavaScript bundle: finished in 88ms. Building JavaScript bundle: finished in 88ms.',
         timestamp: 1569109273726,
-        avatar: require('../assets/avatar.jpg'),
+        avatar: require('../assets/avatar3.jpg'),
         image: require('../assets/image3.jpg')
     },
     {
         id: 4,
-        name: 'Joe McKai',
+        name: 'Adam',
         text: 'Building JavaScript bundle: finished in 88ms. Building JavaScript bundle: finished in 88ms.',
         timestamp: 1569109273726,
         avatar: require('../assets/avatar.jpg'),
@@ -38,23 +38,23 @@ let posts = [
     },
     {
         id: 5,
-        name: 'Joe McKai',
+        name: 'Pak Chi Mun',
         text: 'Building JavaScript bundle: finished in 88ms. Building JavaScript bundle: finished in 88ms.',
         timestamp: 1569109273726,
-        avatar: require('../assets/avatar.jpg'),
+        avatar: require('../assets/avatar2.jpg'),
         image: require('../assets/image5.jpg')
     },
     {
         id: 6,
-        name: 'Joe McKai',
+        name: 'Mr Bin',
         text: 'Building JavaScript bundle: finished in 88ms. Building JavaScript bundle: finished in 88ms.',
         timestamp: 1569109273726,
-        avatar: require('../assets/avatar.jpg'),
+        avatar: require('../assets/avatar3.jpg'),
         image: require('../assets/image6.jpg')
     },
     {
         id: 7,
-        name: 'Joe McKai',
+        name: 'Boris Johnson',
         text: 'Building JavaScript bundle: finished in 88ms. Building JavaScript bundle: finished in 88ms.',
         timestamp: 1569109273726,
         avatar: require('../assets/avatar.jpg'),
@@ -62,10 +62,10 @@ let posts = [
     },
     {
         id: 8,
-        name: 'Joe McKai',
+        name: 'Khan',
         text: 'Building JavaScript bundle: finished in 88ms. Building JavaScript bundle: finished in 88ms.',
         timestamp: 1569109273726,
-        avatar: require('../assets/avatar.jpg'),
+        avatar: require('../assets/avatar2.jpg'),
         image: require('../assets/image8.jpg')
     },
     {
@@ -73,14 +73,13 @@ let posts = [
         name: 'Joe McKai',
         text: 'Building JavaScript bundle: finished in 88ms. Building JavaScript bundle: finished in 88ms.',
         timestamp: 1569109273726,
-        avatar: require('../assets/avatar.jpg'),
+        avatar: require('../assets/avatar3.jpg'),
         image: require('../assets/image9.jpg')
     },
 ]
 
-export default function HomeScreen() {
-    
-    const renderPost = post => {
+export default class HomeScreen extends React.Component {
+    renderPost = post => {
         return (
             <View style={styles.feedItem}>
                 <Image source={post.avatar} style={styles.avatar}></Image>
@@ -103,22 +102,24 @@ export default function HomeScreen() {
             </View>
         )
     }
-    return (
-        <View style={styles.container}>
-           <View style={styles.header}>
-                <Text style={styles.headerTitle}>Feed</Text>
-           </View>
 
-           <FlatList 
-                style={styles.feed}
-                data={posts} 
-                renderItem={({item}) => renderPost(item)} 
-                keyExtractor={item => item.id}
-                showsVerticalScrollIndicator={false}
-            />
-        </View>
+    render () {
+        return (
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <Text style={styles.headerTitle}>Feed</Text>
+                </View>
 
-    )
+                <FlatList 
+                    style={styles.feed}
+                    data={posts} 
+                    renderItem={({item}) => this.renderPost(item)} 
+                    keyExtractor={item => item.id}
+                    showsVerticalScrollIndicator={false}
+                />
+            </View>
+        )
+    }
 }
 
 const styles = StyleSheet.create({
@@ -127,18 +128,18 @@ const styles = StyleSheet.create({
         backgroundColor: '#EFECF4'
     },
     header: {
+        zIndex: 10,
         paddingTop: 64,
-        paddingBottom: 16,
-        backgroundColor: '#FFF',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: '#EBECF4',
-        shadowColor: '#454D65',
-        shadowOffset: {height: 5},
         shadowRadius: 15,
+        paddingBottom: 16,
         shadowOpacity: 0.2,
-        zIndex: 10
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        shadowColor: '#454D65',
+        backgroundColor: '#FFF',
+        justifyContent: 'center',
+        shadowOffset: {height: 5},
+        borderBottomColor: '#EBECF4',
     },
     headerTitle: {
         fontSize: 20,
@@ -148,37 +149,37 @@ const styles = StyleSheet.create({
         marginHorizontal: 16
     },
     feedItem: {
-        backgroundColor: '#FFF',
-        borderRadius: 5,
         padding: 8,
+        borderRadius: 5,
+        marginVertical: 8,
         flexDirection: 'row',
-        marginVertical: 8
+        backgroundColor: '#FFF',
     },
     avatar: {
         width: 36,
         height: 36,
+        marginRight: 16,
         borderRadius: 18,
-        marginRight: 16
     },
     name: {
         fontSize: 15,
-        fontWeight: '500',
         color: '#454D65',
+        fontWeight: '500',
     },
     timestamp: {
         fontSize: 11,
+        marginTop: 4,
         color: '#C4C6CE',
-        marginTop: 4
     },
     post: {
-        marginTop: 16,
         fontSize: 14,
+        marginTop: 16,
         color: '#838889'
     },
     postImage: {
-        width: undefined,
         height: 150,
         borderRadius: 5,
+        width: undefined,
         marginVertical: 16
     }
 })

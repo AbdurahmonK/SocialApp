@@ -1,12 +1,14 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 
-export default function MessageScreen(props) {
-    return (
-        <View style={styles.container}>
-            <Text>MessageScreen</Text>
-        </View>
-    )
+export default class MessageScreen extends React.Component {
+    render() {
+        return (
+            <View style={styles.container}>
+                <Text>Message Screen</Text>
+            </View>
+        )
+    }
 }
 
 const styles = StyleSheet.create({
@@ -15,5 +17,4 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center'
     },
-
 })

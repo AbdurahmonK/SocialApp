@@ -1,41 +1,60 @@
+// import UserPermissions from '../utilities/UserPermissions'
+// // const firebase = require('firebase')
+// // require('firebase/firestore')
+
+//     React.useEffect(() => {
+//         UserPermissions.getPhotoPermission()
+//     })
+
 import React from 'react'
-import { Ionicons } from '@expo/vector-icons'
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image, TextInput } from 'react-native'
+import Fire from '../Fire'
 import Contants from 'expo-constants'
+import { Ionicons } from '@expo/vector-icons'
 import * as Permissions from 'expo-permissions'
 import * as ImagePicker from 'expo-image-picker'
-import Fire from '../Fire'
+import UserPermissions from '../utilities/UserPermissions'
+import { 
+    View,
+    Text, 
+    Image, 
+    TextInput,
+    StyleSheet, 
+    TouchableOpacity, 
+} from 'react-native'
 const firebase = require('firebase')
 require('firebase/firestore')
 
-export default function PostScreen(props) {
-    const [ text, setText ] = React.useState('')
-    const [ image, setImage ] = React.useState(null)
-
-    React.useEffect(() => {
-        getPhotoPermission()
-    })
-
-    const getPhotoPermission = async () => {
-        if(Contants.platform.android) {
-            const {status} = await Permissions.askAsync(Permissions.CAMERA_ROLL)
-
-            if(status != 'granted') {
-                alert('We need permission to access your camera roll')
-            }
-        }
+export default class PostScreen extends React.Component {
+    state = {
+        user: {},
+        text: '',
+        image: null,
     }
 
-    const handlePost = () => {
-        Fire.shared.addPost({ text: text.trim(), localUri: image}).then(ref => {
-            setText('')
-            setImage(null)
-            props.navigation.goBack()
+    unsubscribe = null 
+    componentWillUnmount() {
+        this.unsubscribe()
+    }
+
+    componentDidMount() {
+        UserPermissions.getCameraPermission()
+        const user = this.props.uid || Fire.shared.uid
+
+        this.unsubscribe = Fire.shared.firestore.collection("users").doc(user).onSnapshot(doc => {
+            this.setState({user: doc.data()})
+        })
+    }
+
+    handlePost = () => {
+        Fire.shared.addPost({ text: this.state.text.trim(), localUri: this.state.image}).then(ref => {
+            this.setState({ text: '', image: null})
+            this.props.navigation.goBack()
         }).catch(error => {
             alert(error)
         })
     }
-    const pickImage = async () => {
+
+    pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
@@ -43,42 +62,46 @@ export default function PostScreen(props) {
         })
 
         if(!result.cancelled) {
-            setImage(result.uri)
+            this.setState({image: result.uri})
         }
     }
-    return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => props.navigation.goBack()}>
-                    <Ionicons name='md-arrow-back' size={24} color='#D8D9DB'></Ionicons>
+
+    render() {
+        return (
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+                        <Ionicons name='md-arrow-back' size={24} color='#E9446A'></Ionicons>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.handlePost} style={{height: 30, width: 80, borderRadius: 4, alignItems: 'center', justifyContent: 'center', backgroundColor: '#E9446A'}}>
+                        <Text style={{fontWeight: '500', color: '#FFF'}}>Add Post</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.inputContainer}>
+                    <Image source={this.state.user.avatar ? {uri: this.state.user.avatar} : require('../assets/avatar.jpg')} style={styles.avatar}></Image>
+                    <TextInput 
+                        autoFocus={true} 
+                        multiline={true} 
+                        numberOfLines={4} 
+                        style={{flex: 1}} 
+                        placeholder='Want to share something?'
+                        onChangeText={text => this.setState({text})}
+                        value={this.state.text}
+                    ></TextInput>
+                </View>
+
+                <TouchableOpacity style={styles.photo} onPress={this.pickImage}>
+                    <Ionicons name='md-camera' size={32} color='#E9446A'></Ionicons>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handlePost}>
-                    <Text style={{fontWeight: '500'}}>Add Post</Text>
-                </TouchableOpacity>
-            </View>
 
-            <View style={styles.inputContainer}>
-                <Image source={require('../assets/avatar.jpg')} style={styles.avatar}></Image>
-                <TextInput 
-                    autoFocus={true} 
-                    multiline={true} 
-                    numberOfLines={4} 
-                    style={{flex: 1}} 
-                    placeholder='Want to share something?'
-                    onChangeText={text => setText(text)}
-                    value={text}
-                ></TextInput>
-            </View>
+                <View style={{marginHorizontal: 32, marginTop: 32, height: 150}}>
+                    <Image source={{ uri: this.state.image}} style={{width: '100%', height: '100%'}}></Image>
+                </View>
 
-            <TouchableOpacity style={styles.photo} onPress={pickImage}>
-                <Ionicons name='md-camera' size={32} color='#D8D9Db'></Ionicons>
-            </TouchableOpacity>
-
-            <View style={{marginHorizontal: 32, marginTop: 32, height: 150}}>
-                <Image source={{ uri: image}} style={{width: '100%', height: '100%'}}></Image>
             </View>
-        </SafeAreaView>
-    )
+        )
+    }
 }
 
 const styles = StyleSheet.create({
@@ -86,12 +109,13 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingHorizontal: 32,
         paddingVertical: 12,
+        marginTop: 20,
+        flexDirection: 'row',
         borderBottomWidth: 1,
-        borderBottomColor: '#D8D9DB'
+        paddingHorizontal: 32,
+        borderBottomColor: '#D8D9DB',
+        justifyContent: 'space-between',
     },
     inputContainer: {
         margin: 32,

@@ -1,71 +1,98 @@
+//
+
+//         <View style={styles.container}>
+//             <StatusBar barStyle='light-content'></StatusBar>
+//             <Image source={require('../assets/auth1.png')} style={{position: 'absolute', bottom: 325, right: -425}}></Image>
+//             <Image source={require('../assets/auth1.png')} style={{position: 'absolute', bottom: -555, right: -525}}></Image>
+//             <Image source={require('../assets/logo.png')} style={{alignSelf: 'center', width: 70, height: 70}}></Image>
+//         </View>
+
 import React from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, StatusBar, LayoutAnimation } from 'react-native'
 import * as firebase from 'firebase'
+import { 
+    View, 
+    Text, 
+    Image, 
+    StatusBar, 
+    TextInput, 
+    StyleSheet, 
+    LayoutAnimation, 
+    TouchableOpacity 
+} from 'react-native'
 
-export default function LoginScreen(props) {
-    const [ email, setEmail ] = React.useState('')
-    const [ password, setPassword ] = React.useState('')
-    const [ errorMessage, setErrorMessage ] = React.useState(null)
+export default class LoginScreen extends React.Component {
+    static navigationOptions = {
+        header: null
+    }
 
-    const handleLogin = () => {
+    state = {
+        email: '',
+        password: '',
+        errorMessage: null
+    }
+
+    handleLogin = () => {
+        const { email, password } = this.state
         firebase
             .auth()
             .signInWithEmailAndPassword(email, password)
-            .catch(error => setErrorMessage(error.message))
+            .catch(error => this.setState({errorMessage: error.message}))
     }
-    LayoutAnimation.easeInEaseOut()
-    return (
-        <View style={styles.container}>
-            <StatusBar barStyle='light-content'></StatusBar>
-            <Image source={require('../assets/auth1.png')} style={{position: 'absolute', bottom: 325, right: -425}}></Image>
-            <Image source={require('../assets/auth1.png')} style={{position: 'absolute', bottom: -555, right: -525}}></Image>
-            <Image source={require('../assets/logo.png')} style={{alignSelf: 'center', width: 70, height: 70}}></Image>
 
-            <Text style={styles.greeting}>
-                {`Hello again.\nWelcome back.`}
-            </Text>
-
-            <View style={styles.errorMessage}>
-                <Text>
-                    {errorMessage && <Text style={styles.error}>{errorMessage}</Text>}
+    render () {
+        LayoutAnimation.easeInEaseOut()
+        
+        return (
+            <View style={styles.container}>
+                <StatusBar barStyle='light-content'></StatusBar>
+                <Image source={require('../assets/auth1.png')} style={{marginTop: -470, marginLeft: -50}}></Image>
+                {/* <Image source={require('../assets/auth1.png')} style={{position: 'absolute', bottom: -500, right: -350}}></Image> */}
+                <Image source={require('../assets/logo.png')} style={{alignSelf: 'center', width: 70, height: 70}}></Image>
+                <Text style={styles.greeting}>
+                    {`Hello again.\nWelcome back.`}
                 </Text>
-            </View>
 
-            <View style={styles.form}>
-                <View>
-                    <Text style={styles.inputTitle}>Email Address</Text>
-                    <TextInput 
-                        style={styles.input} 
-                        autoCapitalize='none' 
-                        onChangeText={email => setEmail(email)}
-                        value={email}
-                    ></TextInput>
+                <View style={styles.errorMessage}>
+                    <Text>
+                        {this.state.errorMessage && <Text style={styles.error}>{this.state.errorMessage}</Text>}
+                    </Text>
                 </View>
 
-                <View style={{marginTop: 32}}>
-                    <Text style={styles.inputTitle}>Password</Text>
-                    <TextInput 
-                        style={styles.input} 
-                        secureTextEntry 
-                        autoCapitalize='none'
-                        onChangeText={password => setPassword(password)}
-                        value={password}
-                    ></TextInput>
+                <View style={styles.form}>
+                    <View>
+                        <Text style={styles.inputTitle}>Email Address</Text>
+                        <TextInput 
+                            style={styles.input} 
+                            autoCapitalize='none'
+                            value={this.state.email}
+                            onChangeText={email => this.setState({email})}
+                        ></TextInput>
+                    </View>
+
+                    <View style={{marginTop: 32}}>
+                        <Text style={styles.inputTitle}>Password</Text>
+                        <TextInput 
+                            secureTextEntry 
+                            style={styles.input} 
+                            autoCapitalize='none'
+                            value={this.state.password}
+                            onChangeText={password => this.setState({password})}
+                        ></TextInput>
+                    </View>
                 </View>
+
+                <TouchableOpacity style={styles.button} onPress={this.handleLogin}>
+                    <Text style={{color: '#FFF', fontWeight: '500'}}>Sign In</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={{alignSelf: 'center', marginTop: 22}} onPress={() => this.props.navigation.navigate('Register')}>
+                    <Text style={{color: '#414959', fontSize: 13}}>
+                        New to SocialApp? <Text style={{color: '#E9446A', fontWeight: '500'}}>Sign Up</Text>
+                    </Text>
+                </TouchableOpacity>
             </View>
-
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={{color: '#FFF', fontWeight: '500'}}>Sign In</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={{alignSelf: 'center', marginTop: 32}} onPress={() => props.navigation.navigate('Register')}>
-                <Text style={{color: '#414959', fontSize: 13}}>
-                    New to SocialApp? <Text style={{color: '#E9446A', fontWeight: '500'}}>Sign Up</Text>
-                </Text>
-            </TouchableOpacity>
-
-        </View>
-    )
+        )
+    }
 }
 
 const styles = StyleSheet.create({
@@ -73,46 +100,46 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     greeting: {
-        marginTop: 32,
         fontSize: 18,
+        // marginTop: -32,
         fontWeight: "400",
         textAlign: 'center',
     },
     errorMessage: {
         height: 72,
         alignItems: 'center',
+        marginHorizontal: 30,
         justifyContent: 'center',
-        marginHorizontal: 30
     },
     error: {
-        color: '#E9446A',
         fontSize: 13,
+        color: '#E9446A',
         fontWeight: '600',
-        textAlign: 'center'
+        textAlign: 'center',
     },
     form: {
         marginBottom: 40,
         marginHorizontal: 30
     },
     inputTitle: {
-        color: '#BABF9E',
         fontSize: 10,
+        color: '#BABF9E',
         textTransform: 'uppercase'
     },
     input: {
-        borderBottomColor: '#BABF9E',
-        borderBottomWidth: StyleSheet.hairlineWidth,
         height: 40,
         fontSize: 15,
-        color: '#161F3D'
+        color: '#161F3D',
+        borderBottomColor: '#BABF9E',
+        borderBottomWidth: StyleSheet.hairlineWidth,
     },
     button: {
-        marginHorizontal: 30,
-        backgroundColor: '#E9446A',
-        borderRadius: 4,
         height: 52,
+        borderRadius: 4,
+        marginHorizontal: 30,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        backgroundColor: '#E9446A',
     }
 
 })
